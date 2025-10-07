@@ -1,0 +1,15 @@
+# Diretório de dependências do Node.js
+node_modules
+/node_modules
+
+# Arquivo de bloqueio de pacote
+package-lock.json
+
+# Pastas e arquivos específicos do WhatsApp/wwebjs
+# Arquivos de sessão, cache, etc.
+.wwebjs_auth
+session.json
+qrcode.png
+
+# Arquivo de ambiente (se você usar .env localmente)
+.env
