@@ -1,25 +1,30 @@
 {
-  "name": "chatbot-whatsapp",
+  "name": "prisma-danca-whatsapp-bot",
   "version": "1.0.0",
-  "description": "Chatbot simples com WhatsApp Web JS e persistência no MongoDB.",
+  "description": "Chatbot WhatsApp para o Prisma Projeto de Dança com persistência de sessão via MongoDB.",
   "main": "chatbot.js",
   "scripts": {
-    "start": "npm install && node chatbot.js"
+    "start": "node chatbot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "whatsapp",
-    "bot",
-    "mongo",
+    "chatbot",
+    "wwebjs",
+    "mongodb",
     "render"
   ],
-  "author": "",
+  "author": "Camila",
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
     "mongoose": "^8.4.1",
+    "puppeteer": "^22.9.0",
     "qrcode": "^1.5.3",
-    "whatsapp-web.js": "1.23.0",
-    "wwebjs-mongo": "^1.1.0",
-    "mongodb": "4.17.2"
+    "whatsapp-web.js": "^1.23.0",
+    "wwebjs-mongo": "^1.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
