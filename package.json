@@ -1,24 +1,26 @@
 {
-  "dependencies": {
-    "express": "^4.18.2",
-    "moment-timezone": "^0.5.45",
-    "mongodb": "^6.8.0",
-    "mongoose": "^8.4.4",
-    "openai": "^4.78.1",
-    "qrcode": "^1.5.1",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.33.2",
-    "wwebjs-mongo": "^1.1.0"
-  },
-  "name": "chatbot",
+  "name": "chatbot-whatsapp",
   "version": "1.0.0",
+  "description": "Chatbot simples com WhatsApp Web JS e persistência no MongoDB.",
   "main": "chatbot.js",
   "scripts": {
-    "start": "node chatbot.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node chatbot.js"
   },
-  "keywords": [],
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "mongo",
+    "render"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "Chatbot com autenticação MongoDB para persistência de sessão."
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "qrcode": "^1.5.3",
+    "whatsapp-web.js": "1.23.0"
+  },
+  "overrides": {
+    "mongodb": "4.17.2"
+  }
 }
