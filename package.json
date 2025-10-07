@@ -18,7 +18,8 @@
     "express": "^4.19.2",
     "mongoose": "^8.4.1",
     "qrcode": "^1.5.3",
-    "whatsapp-web.js": "1.23.0"
+    "whatsapp-web.js": "1.23.0",
+    "wwebjs-mongo": "^1.1.0" // <-- DEPENDENCIA ADICIONADA AQUI
   },
   "overrides": {
     "mongodb": "4.17.2"
