@@ -1,18 +1,16 @@
 // ----------------------------------------------------
 // 1. IMPORTS E CONFIGURAÇÃO DE AMBIENTE
 // ----------------------------------------------------
-const { Client, MessageMedia } = require('whatsapp-web.js');
-// Usamos MongoAuthStrategy para autenticação remota
-const { MongoAuthStrategy } = require('wwebjs-mongo');
+const { Client, MessageMedia, RemoteAuth } = require('whatsapp-web.js'); // <-- RemoteAuth importado
+const { MongoStore } = require('wwebjs-mongo'); // <-- CORRIGIDO: Agora importa MongoStore
 const mongoose = require('mongoose');
 const qrcode = require('qrcode');
 const express = require('express');
 const fs = require('fs');
-const path = require('path'); // Adicionamos 'path' para resolver caminhos de arquivos de forma segura
+const path = require('path'); 
 
 // Lê as variáveis de ambiente necessárias
 const PORT = process.env.PORT || 3000; 
-// ATENÇÃO: A variável de ambiente DEVE ser lida do process.env
 const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://camiladsetec_db_user:Camila1605m@cluster0.nyiiuv1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; 
 
 // ----------------------------------------------------
@@ -20,7 +18,6 @@ const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://camiladsetec_db_user
 // ----------------------------------------------------
 const app = express();
 app.get('/', (req, res) => {
-    // Resposta de status crucial para o Render saber que o serviço está ativo
     res.status(200).send('Chatbot Prisma Projeto de Dança está ativo e conectado ao WhatsApp e MongoDB.');
 });
 
@@ -28,7 +25,6 @@ app.get('/', (req, res) => {
 // 3. CONEXÃO COM O BANCO DE DADOS E INICIALIZAÇÃO DO CLIENTE
 // ----------------------------------------------------
 
-// Verifica se a URI do MongoDB está presente
 if (!MONGO_URI) {
     console.error("ERRO: A URI do MongoDB não foi definida. Verifique suas variáveis de ambiente.");
     app.listen(PORT, () => console.log(`Servidor Express iniciado (APENAS) na porta ${PORT} devido a erro no DB.`));
@@ -37,15 +33,20 @@ if (!MONGO_URI) {
         .then(() => {
             console.log('✅ Conexão com MongoDB estabelecida com sucesso!');
 
-            // 1. Cria o cliente com a estratégia de autenticação do MongoDB
+            // 1. Cria a Store (Loja) do MongoDB usando a classe MongoStore
+            const store = new MongoStore({
+                mongoose: mongoose // Passa a instância do Mongoose conectada
+            });
+
+            // 2. Cria o cliente com a estratégia de autenticação RemoteAuth, usando a Store
             const client = new Client({
-                // Usa o MongoAuthStrategy para persistir a sessão
-                authStrategy: new MongoAuthStrategy({ mongoose: mongoose }),
+                // CORRIGIDO: Usamos RemoteAuth e passamos a instância do MongoStore
+                authStrategy: new RemoteAuth({ 
+                    store: store
+                }),
                 
-                // 2. Argumentos do Puppeteer (CRÍTICO para Render/ambientes headless)
+                // 3. Argumentos do Puppeteer (CRÍTICO para Render/ambientes headless)
                 puppeteer: {
-                    // Nota: O executablePath só é necessário se você estiver instalando um Chromium customizado.
-                    // Em ambientes como o Render, o Puppeteer baixa o executável automaticamente.
                     args: [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
@@ -62,14 +63,11 @@ if (!MONGO_URI) {
             const delay = ms => new Promise(res => setTimeout(res, ms));
 
 
-            // 3. Listeners e inicialização
+            // 4. Listeners e inicialização
             client.on('qr', async qr => {
                 console.log('Gerando QR Code...');
-                // Salva o QR code em um arquivo .png para debug (no Render, você deve 
-                // ler os logs do console para o QR code, ou usar um terminal interativo)
                 await qrcode.toFile('qrcode.png', qr, { scale: 10 }); 
                 
-                // Loga o QR code em formato de string para que você possa escanear nos logs do Render
                 console.log('⚠️ QR CODE DETECTADO ⚠️:', qr); 
                 console.log('ESCANEIE ESTE CÓDIGO O MAIS RÁPIDO POSSÍVEL!');
             });
@@ -84,15 +82,13 @@ if (!MONGO_URI) {
 
             client.on('disconnected', (reason) => {
                 console.log('🟡 Cliente desconectado. Tentando reconectar...', reason);
-                // Tenta reiniciar o cliente após a desconexão
-                // client.initialize(); // Descomente se quiser tentar reconexão automática
             });
 
             client.initialize();
             
 
             // ----------------------------------------------------
-            // 4. FUNIL DE MENSAGENS E LÓGICA
+            // 5. FUNIL DE MENSAGENS E LÓGICA
             // ----------------------------------------------------
             client.on('message', async msg => {
                 try {
@@ -239,14 +235,13 @@ if (!MONGO_URI) {
         })
         .catch(err => {
             console.error('🔴 ERRO FATAL: Não foi possível conectar ao MongoDB.', err);
-            // O Express inicia para que o Render não desligue o serviço
             app.listen(PORT, () => console.log(`Servidor Express iniciado (APENAS) na porta ${PORT} devido a erro no DB.`));
         });
 }
 
 
 // ----------------------------------------------------
-// 5. INICIALIZAÇÃO DO SERVIDOR EXPRESS (Garante que o Render fique ligado)
+// 6. INICIALIZAÇÃO DO SERVIDOR EXPRESS (Garante que o Render fique ligado)
 // ----------------------------------------------------
 app.listen(PORT, () => {
     console.log(`Servidor Express iniciado e escutando na porta ${PORT}`);
