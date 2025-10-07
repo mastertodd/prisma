@@ -4,7 +4,7 @@
   "description": "Chatbot simples com WhatsApp Web JS e persistência no MongoDB.",
   "main": "chatbot.js",
   "scripts": {
-    "start": "node chatbot.js"
+    "start": "npm install && node chatbot.js"
   },
   "keywords": [
     "whatsapp",
